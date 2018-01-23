@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>The Poster | BoP</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/4.3.0/firebase.js"></script>
+
+    <link rel="icon" type="image/png" href="fav.png">
+    <style type="text/css">
+       #ee {
+        position: absolute;
+        right: 10px;
+        top: 200px;
+        font-style: italic;
+       }
+
+    </style>
+</head>
+
+<body>
+  <form action="javascript:loginNow()" id="loginForm">
+    <p>Login to access writing tools</p><br><br>
+    <input type="email" name="email" placeholder="email" />
+    <input type="password" name="pwd" placeholder="password" />
+    <input type="submit" value="Submit" />
+  </form>
+  <p id="login_error" style="display:none;">Invalid credentials</p>
+  <div id="manager">
+      <button id="logOut" onClick="firebase.auth().signOut()">Sign Out</button>
+      <br><br>
+      <p>Create Post:</p><br>
+      <div id="dd">
+        <label></label> Title: <input type="text" name="title"></label><br><br>
+        <label>Content: <textarea rows="25" cols="120" name="desc"></textarea></label><br><br>
+        <button id="post">Post</button></br></br>
+        <label>Upload Media: <input type="text" name="img"></label><br><br>
+        <label> Image: <input id="file" type="file"></label><br><br>
+      </div>
+      <div id="ee">
+
+      </div>
+  </div>
+  
+<script type="text/javascript">
+  /*global firebase,$,jQuery*/
+var config = {
+    apiKey: "AIzaSyA1TEhAzFF0I_Ye3PygvnRbcm18QWz63fY",
+    authDomain: "bowlofpork.firebaseapp.com",
+    databaseURL: "https://bowlofpork.firebaseio.com",
+    projectId: "bowlofpork",
+    storageBucket: "bowlofpork.appspot.com"
+};
+firebase.initializeApp(config);
+var db = firebase.database();
+const dbRef = firebase.database().ref('postData/');
+const stRef = firebase.storage().ref('/');
+const authy = firebase.auth();
+
+  function loginNow() {
+    var email = $('input[name=email]').val();
+    var password = $('input[type=password][name=pwd]').val();
+    authy.signInWithEmailAndPassword(email, password).catch(function(error) {
+      $('#login_error').css({'display':'block'});
+    });
+  }
+  
+  authy.onAuthStateChanged(user => {
+      if(user){
+        $('#manager').show();
+        $('#loginForm').hide();
+        $('#login_error').hide();
+        populate();
+      }
+      else {
+        $('#manager').hide();
+        $('#loginForm').show();
+      }
+  });
+
+
+  function populate() {
+    dbRef.once('value', (snapshot) => {
+      snapshot.forEach((items) => {
+        item = items.val();
+        $('#ee').append('<a href="#" postId="'+items.key+'">'+item.title+' - '+item.date+'</a><br>');
+      });
+      $('a').click(function() { edit($(this)); });
+    });
+  }
+  
+
+function edit(post) {
+  dbRef.child(post.attr('postId')).once('value', (snapshot) => {
+    var i = snapshot.val();
+    $('[name=title]').val(i.title);
+    stRef.child('posts/'+snapshot.key+'.html').getDownloadURL().then((url) => {
+        $.get(url, (data) => { 
+            $('[name=desc]').val(data);
+        });
+    });
+    $('#post').hide();
+    $('<br><br><button id="edit">Edit'+snapshot.key+'</button>').insertAfter('[name=desc]');
+    $('#edit').click(() => {
+      $('<p id="uploading">Posting...</p>').insertAfter('#edit');
+      var name = $('[name=title]').val()+'.html';
+      var title = $('[name=title]').val();
+      var HTMLcontent = $('[name=desc]').val();
+      var stChild = stRef.child('posts/'+snapshot.key+'.html');
+      stChild.putString(HTMLcontent).then(e => {
+            var date = new Date();
+            dbRef.child(snapshot.key).set({"name": name, "title": title, "loves": i.loves, "date": i.date});
+            $('#uploading').hide();
+            $('<p>Success</p>').insertAfter('#post');
+        });
+    });
+  });
+}
+
+
+  const s4 = Math.floor((1 + Math.random()) * 0x10000).toString(16);
+  $('#post').click(() => {
+    $('<p id="uploading">Posting...</p>').insertAfter('#post');
+    var name = $('[name=title]').val()+'.html';
+    var title = $('[name=title]').val();
+    var HTMLcontent = $('[name=desc]').val();
+    var stChild = stRef.child('posts/'+s4+'.html');
+    stChild.putString(HTMLcontent).then(e => {
+          var date = new Date();
+          dbRef.child(s4).set({"name": name, "title": title, "loves": 0, "date": (date.getMonth()+1)+'/'+date.getDate()+'/'+date.getFullYear()});
+          $('#uploading').hide();
+          $('<p>Success</p>').insertAfter('#post');
+      });
+  });
+  
+ $(':file').on('change', file => {
+      $('<p id="uploading">Uploading image...</p>').insertAfter(':file');
+      var newUpload = document.querySelector('#file').files[0];
+      var stChild = stRef.child('media/'+newUpload.name);
+      stChild.put(newUpload).then(e => {
+          stRef.child('media/'+newUpload.name).getDownloadURL().then((url) => {
+            $('<pre>&lt;img src=\''+url+'.png\' /></pre>').insertAfter('#uploading');
+            $('#uploading').hide();
+          });
+      });
+  });
+  
+  
+</script>
+  </body>
+  </html>
+
+
+
+

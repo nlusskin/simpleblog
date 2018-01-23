@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+<!-- Global site tag -->
+
+
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<title>Bowl of Pork</title>
+<meta name="description" content="">
+<meta name="keywords" content="">
+
+<meta property="og:title" content="A Bowl of Pork" />
+<meta property="og:description" content="" />
+<meta property="og:type" content="website" />
+<meta property="og:url" content="https://" />
+<meta property="og:image" content="http://" />
+<!-- jQuery -->
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+<!--Firebase-->
+<script src="https://www.gstatic.com/firebasejs/3.8.0/firebase.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+<script crossorigin src="https://unpkg.com/react@16/umd/react.production.min.js"></script>
+<script crossorigin src="https://unpkg.com/react-dom@16/umd/react-dom.production.min.js"></script>
+<script src="https://unpkg.com/babel-standalone@6.24.0/babel.js"></script>
+
+
+<link rel="icon" type="image/png" href="fav.png">
+
+<!--<link rel="stylesheet" href="https://necolas.github.io/normalize.css/7.0.0/normalize.css" type="text/css">-->
+<link rel="stylesheet" href="style.css" type="text/css">
+<link rel="stylesheet" href="fa/css/font-awesome.min.css" type="text/css">
+
+</head>
+<body>
+
+    <div id="rootHeader"></div>
+    <i class="fa fa-circle-o-notch fa-spin fa-3x fa-fw"></i>
+    <div id="root"></div>
+    <div id="rootFooter"></div>
+    
+    <script src="anchors.js" type="text/babel"></script>
+    <script src="post.js" type="text/babel"></script>
+
+
+<script type="text/javascript">
+  /*global firebase,$,jQuery*/
+var config = {
+    apiKey: "AIzaSyA1TEhAzFF0I_Ye3PygvnRbcm18QWz63fY",
+    authDomain: "bowlofpork.firebaseapp.com",
+    databaseURL: "https://bowlofpork.firebaseio.com",
+    projectId: "bowlofpork",
+    storageBucket: "bowlofpork.appspot.com"
+};
+firebase.initializeApp(config);
+var db = firebase.database();
+const dbRef = firebase.database().ref('/globalData');
+const stRef = firebase.storage().ref('/');
+const authy = firebase.auth();
+
+
+</script>
+</body>
+</html>
